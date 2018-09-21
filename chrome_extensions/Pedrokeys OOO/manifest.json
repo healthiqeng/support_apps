@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+
+  "name": "Pedrokeys: The InContact Helper for OOS",
+  "description": "Hotkeys for InContact",
+  "version": "1.3",
+
+  "browser_action": {
+    "default_icon": "pedro.png"
+  },
+  "icons": { 
+    "48": "pedro.png",
+    "128": "pedro.png"
+  },
+  "permissions": [
+  ],
+
+  "content_scripts":[{
+    "run_at":"document_end",
+    "matches":["https://*.incontact.com/*MAX*"],
+    "js":["jquery.min.js", "jquery.hotkeys.js", "hiq_hotkeys.js"],
+    "css":["hiq_ic.css"]
+  }]
+}
