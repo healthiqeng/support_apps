@@ -41,7 +41,7 @@ class HiqHotkeys{
 
   click(query, name){
     let element = $j(query);
-    if(element.length){
+    if(element.length && element.is(':visible')){
       element.click();
       return true;
     }else{
@@ -71,6 +71,7 @@ class HiqHotkeys{
 
   setDisposition(disp){
     console.log(`handle dispo ${disp}`);
+
     if(this.click(`.primary-disposition [title="${disp}"]`, disp)){
       let success = this.finalize();
       if(success){
