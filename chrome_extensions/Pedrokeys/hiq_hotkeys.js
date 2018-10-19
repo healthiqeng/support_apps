@@ -2,7 +2,7 @@
 
 var $j = jQuery.noConflict();
  
-
+/**/
 /* Key Shortcuts /*
 // ctrl + t = Touched Trivially
 // ctrl + d = Disability
@@ -30,13 +30,27 @@ const BANNER_CLASS = 'hiq-banner';
 const HANGUP_BUTTON = '.end-contact';
 const HANGUP_CONFIRM_BUTTON = '.confirm-end-contact';
 const SUBMIT_BUTTON = '.save-close-acw-submit';
-const PREFIX = 'ctrl';
-const FRIENDLY_PREFIX = 'Ctrl';
+var PREFIX = "";
+var FRIENDLY_PREFIX = "";
 
 class HiqHotkeys{
   constructor(){
     this.helpText = [];
+    this.isMac();
     this.bindKeys();
+  }
+
+  isMac(){
+    if (navigator.platform.indexOf('Mac') > -1){
+      console.log("Mac");
+      PREFIX = 'ctrl';
+      FRIENDLY_PREFIX = 'Ctrl';
+    }
+    else{
+      console.log("PC");
+      PREFIX = 'alt';
+      FRIENDLY_PREFIX = 'Alt';
+    }
   }
 
   click(query, name){
