@@ -41,7 +41,7 @@ class HiqHotkeys{
 
   click(query, name){
     let element = $j(query);
-    if(element.length){
+    if(element.length && element.is(':visible')){
       element.click();
       return true;
     }else{
