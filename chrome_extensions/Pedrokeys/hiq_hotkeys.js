@@ -1,7 +1,7 @@
 /*global jQuery*/
 
 var $j = jQuery.noConflict();
- 
+console.log("Version 1.5");
 /**/
 /* Key Shortcuts /*
 // ctrl + t = Touched Trivially
@@ -30,8 +30,7 @@ const BANNER_CLASS = 'hiq-banner';
 const HANGUP_BUTTON = '.end-contact';
 const HANGUP_CONFIRM_BUTTON = '.confirm-end-contact';
 const SUBMIT_BUTTON = '.save-close-acw-submit';
-var PREFIX = "";
-var FRIENDLY_PREFIX = "";
+
 
 class HiqHotkeys{
   constructor(){
@@ -42,20 +41,20 @@ class HiqHotkeys{
 
   isMac(){
     if (navigator.platform.indexOf('Mac') > -1){
-      console.log("Mac");
-      PREFIX = 'ctrl';
-      FRIENDLY_PREFIX = 'Ctrl';
+      console.log("is Mac");
+      this.PREFIX = 'ctrl';
+      this.FRIENDLY_PREFIX = 'Ctrl';
     }
     else{
-      console.log("PC");
-      PREFIX = 'alt';
-      FRIENDLY_PREFIX = 'Alt';
+      console.log("is PC");
+      this.PREFIX = 'alt';
+      this.FRIENDLY_PREFIX = 'Alt';
     }
   }
 
   click(query, name){
     let element = $j(query);
-    if(element.length && element.is(':visible')){
+    if(element.length){
       element.click();
       return true;
     }else{
@@ -71,29 +70,87 @@ class HiqHotkeys{
     div.text(text);
     div.addClass(BANNER_CLASS);
     $j('body').append(div);
-    div.fadeIn(250).delay(3000).fadeOut(250);
+    div.fadeIn(250).delay(3000).fadeOut(150);
   }
 
   hangUp(){
-    return this.click(HANGUP_BUTTON, 'Hangup Button') &&
+    var activeContact = document.querySelector('div .module-container[data-status="Active"]');
+    var disconnectedContact = document.querySelector('div .module-container[data-status="Disconnected"]');
+
+    if(activeContact){
+      var endContact = activeContact.querySelector('.confirm-end-contact');
+    endContact.click();
+    }
+    else if (disconnectedContact){
+      return this.click(HANGUP_BUTTON, 'Hangup Button') &&
       this.click(HANGUP_CONFIRM_BUTTON, 'Hangup Confirm Button');
+    }
+   
   }
 
   finalize(){
     return this.click(SUBMIT_BUTTON, 'Submit button');
   }
 
-  setDisposition(disp){
-    console.log(`handle dispo ${disp}`);
+  save(){
+    //var activeContact = document.querySelector('div .module-container[data-status="Active"]');
+    //var saveButton = activeContact.querySelector('form.acw-form button.save');
+    //return this.click(saveButton, 'Save button') 
+    var activeContact = document.querySelector('div .module-container[data-status="Active"]');
+    var saveButton = activeContact.querySelector('form.acw-form button.save');
+    saveButton.click();
 
-    if(this.click(`.primary-disposition [title="${disp}"]`, disp)){
-      let success = this.finalize();
-      if(success){
-        this.banner(disp);
-        console.log(`Succesfully hit a ${disp}`);
+  }
+
+
+
+  setDisposition(disp){
+
+    var activeContact = document.querySelector('div .module-container[data-status="Active"]');
+    var disconnectedContact = document.querySelector('div .module-container[data-status="Disconnected"]');
+    
+      
+    if (activeContact) {
+      console.log("This is an Active Call");
+      console.log(`handling dispo ${disp}`);
+
+      for (var i = 0; i < activeContact.querySelectorAll('.primary-disposition .selectmenu-menu-item').length; i++){
+      var dispotitle = activeContact.querySelectorAll('.primary-disposition .selectmenu-menu-item')[i].title;
+       console.log(dispotitle +`compare to ${disp}`);
+        if ( dispotitle == disp) {
+          var dispo = activeContact.querySelectorAll('.primary-disposition .selectmenu-menu-item')[i]; //You’ll want to move this to your desired dispo item
+          dispo.click();
+          this.save();
+          let success = this.finalize();
+        if(success){
+          this.banner(disp);
+          console.log(`Succesfully hit a ${disp}`);
+        }
       }
     }
   }
+  else if (disconnectedContact){
+    console.log("This is a Disconnected Call");
+    console.log(`handling dispo ${disp}`);
+         for (var i = 0; i < disconnectedContact.querySelectorAll('.primary-disposition .selectmenu-menu-item').length; i++){
+      console.log("iterating through list of dispos");
+      var dispotitle = disconnectedContact.querySelectorAll('.primary-disposition .selectmenu-menu-item')[i].title;
+       console.log(dispotitle +`compare to ${disp}`);
+        if ( dispotitle == disp) {
+          var dispo = disconnectedContact.querySelectorAll('.primary-disposition .selectmenu-menu-item')[i]; //You’ll want to move this to your desired dispo item
+          dispo.click();
+          let success = this.finalize();
+        if(success){
+          this.banner(disp);
+          console.log(`Succesfully hit a ${disp}`);
+        }
+      }
+    }
+
+
+  }
+}
+
 
   handleHotkey(hotkey){
     console.log(`handle hotkey ${hotkey}`);
@@ -142,9 +199,9 @@ class HiqHotkeys{
   }
 
   installHotkey(key, method, helpText){
-    let binding = `${PREFIX}+${key}`;
+    let binding = `${this.PREFIX}+${key}`;
     $j(document).bind('keydown', binding, method);
-    this.helpText.push([`${FRIENDLY_PREFIX} + ${key}`, helpText]);
+    this.helpText.push([`${this.FRIENDLY_PREFIX} + ${key}`, helpText]);
   }
   /* Key Shortcuts /*
     //ctrl + t = Touched Trivially
